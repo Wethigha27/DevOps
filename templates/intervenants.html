@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <title>Gestion des Intervenants</title>
+<style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('/static/images/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #ffffff, #f4f4f4);
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        h2 {
+            text-align: center;
+            color: #364a85;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        #search-input {
+            padding: 10px 15px;
+            width: 300px;
+            border-radius: 25px;
+            border: 1px solid #ddd;
+            outline: none;
+            transition: box-shadow 0.3s ease;
+            background: #fff url('https://cdn-icons-png.flaticon.com/512/622/622669.png') no-repeat 10px center;
+            background-size: 20px 20px;
+            padding-left: 40px;
+        }
+        
+        #search-input:focus {
+            box-shadow: 0 0 10px rgba(72, 144, 255, 0.7);
+            border-color: #4b6cb7;
+        }
+        
+        .add-intervenant-button {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #4b6cb7, #364a85);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .add-intervenant-button i {
+            margin-right: 8px;
+        }
+        
+        .add-intervenant-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .intervenant-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .intervenant-table th, .intervenant-table td {
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .intervenant-table th {
+            background: #4b6cb7;
+            color: white;
+            text-transform: uppercase;
+        }
+        
+        .intervenant-table tr:nth-child(odd) {
+            background: #f8f9fa;
+        }
+        
+        .intervenant-table tr:hover {
+            background: #eef5ff;
+        }
+        
+        .edit-btn, .delete-btn {
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .edit-btn {
+            background: #5cb85c;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .edit-btn:hover {
+            background: #4cae4c;
+            transform: scale(1.05);
+        }
+        
+        .delete-btn {
+            background: #d9534f;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c9302c;
+            transform: scale(1.05);
+        }
+        
+        @media (max-width: 768px) {
+            .table-controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+        
+            #search-input {
+                width: 100%;
+            }
+        
+            .add-intervenant-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        </style>    
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container">
+        <h2>Gestion des Intervenants</h2>
+        
+        <div class="table-controls">
+            <input type="text" id="search-input" placeholder="Rechercher...">
+            <a href="{{ url_for('add_intervenant') }}" class="add-intervenant-button">
+                <i class="fas fa-user-plus"></i> Ajouter un intervenant
+            </a>
+        </div>
+        
+        <table class="intervenant-table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Poste</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="intervenant-table-body">
+                {% for intervenant in intervenants %}
+                <tr>
+                    <td>{{ intervenant.nom }}</td>
+                    <td>{{ intervenant.prenom }}</td>
+                    <td>{{ intervenant.poste }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_intervenant', id=intervenant.id) }}" class="edit-btn">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <form action="{{ url_for('delete_intervenant', id=intervenant.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="delete-btn" onclick="confirmDelete(event);">
+                                <i class="fas fa-trash-alt"></i> Supprimer
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+       
+        document.getElementById('search-input').addEventListener('input', function () {
+            const searchValue = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.intervenant-table tbody tr');
+            
+            rows.forEach(row => {
+                const nom = row.cells[0].textContent.toLowerCase();
+                const prenom = row.cells[1].textContent.toLowerCase();
+                const poste = row.cells[2].textContent.toLowerCase();
+
+                row.style.display = (nom.includes(searchValue) || prenom.includes(searchValue) || poste.includes(searchValue)) ? '' : 'none';
+            });
+        });
+
+        function confirmDelete(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Êtes-vous sûr ?',
+                text: "Vous ne pourrez pas annuler cette action !",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d9534f',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Oui, supprimer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.closest('form').submit();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

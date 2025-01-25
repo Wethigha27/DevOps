@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Modifier un Intervenant</title>
+    <style>
+        .container {
+            max-width: 400px;
+            margin-top: 100px;
+            margin-left: 30%;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #364a85;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #364a85;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #4b6cb7;
+            outline: none;
+            box-shadow: 0 0 5px rgba(75, 108, 183, 0.3);
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            width: 48%;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-enregistrer {
+            background-color: #4b6cb7;
+            color: white;
+        }
+
+        .btn-enregistrer:hover {
+            background-color: #364a85;
+        }
+
+        .btn-annuler {
+            background-color: #d9534f;
+            color: white;
+        }
+
+        .btn-annuler:hover {
+            background-color: #b52b29;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form method="POST" action="{{ url_for('edit_intervenant', id=intervenant.id) }}" onsubmit="confirmSubmission(event);">
+            <h2>Modifier un Intervenant</h2>
+
+
+            <div class="form-group">
+                <label for="nom">Nom</label>
+                <input type="text" id="nom" name="nom" value="{{ intervenant.nom }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="prenom">Prénom</label>
+                <input type="text" id="prenom" name="prenom" value="{{ intervenant.prenom }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="poste">Poste</label>
+                <input type="text" id="poste" name="poste" value="{{ intervenant.poste }}" required>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-enregistrer">Enregistrer</button>
+                <button type="button" class="btn btn-annuler" onclick="window.location.href='/intervenants';">Annuler</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function confirmSubmission(event) {
+            event.preventDefault(); // Empêche le formulaire de se soumettre immédiatement
+            
+            Swal.fire({
+                title: 'Confirmer l\'action',
+                text: "Voulez-vous vraiment soumettre ce formulaire ?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4b6cb7',
+                cancelButtonColor: '#d9534f',
+                confirmButtonText: 'Oui',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.submit(); // Soumet le formulaire si l'utilisateur confirme
+                }
+            });
+        }
+    </script>
+</body>
+</html>

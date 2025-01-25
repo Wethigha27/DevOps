@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphiques des Interventions</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Style pour le conteneur principal */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+            position: relative;
+            margin-bottom: 50px;
+        }
+
+        /* Style pour le bouton de retour */
+        .btn-retour {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            font-size: 1em;
+            color: #ffffff;
+            background-color: #4b6cb7;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-retour:hover {
+            background-color: #364a85;
+        }
+
+        .btn-retour i {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        /* Style pour les titres */
+        h2 {
+            text-align: center;
+            font-size: 1.2em;
+            color: #343a40;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        /* Conteneur pour les graphiques */
+        .graph-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-top: 45px;
+            margin-bottom: 50px;
+        }
+
+        /* Style pour chaque graphique */
+        .graph-wrapper {
+            flex: 1;
+            min-width: 45%;
+        }
+
+        .graph {
+            height: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: #ffffff;
+            padding: 10px;
+        }
+
+        /* Style pour améliorer le titre des graphiques */
+    .graph-title {
+        font-size: 1.5em; /* Augmente la taille de la police */
+        font-weight: bold; /* Rendre le texte en gras */
+        color: #333; /* Couleur sombre pour un meilleur contraste */
+        text-align: center; /* Centrer le titre */
+        margin-bottom: 15px; /* Ajouter un espace en bas */
+        text-transform: uppercase; /* Tout en majuscules pour uniformité */
+    }
+    </style>
+</head>
+<body>
+    <!-- Bouton pour revenir à la page de gestion des interventions -->
+    <a href="/interventions" class="btn-retour">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+
+    <!-- Conteneur des graphiques -->
+    <div class="graph-container">
+        <div class="graph-wrapper">
+            
+            <div id="graph-etat" class="graph"></div>
+        </div>
+        <div class="graph-wrapper">
+            <div id="graph-intervenants" class="graph"></div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var graphEtat = JSON.parse('{{ graph_etat | safe }}');
+        Plotly.newPlot('graph-etat', graphEtat.data, graphEtat.layout);
+
+        var graphIntervenants = JSON.parse('{{ graph_intervenants | safe }}');
+        Plotly.newPlot('graph-intervenants', graphIntervenants.data, graphIntervenants.layout);
+    </script>
+</body>
+</html>

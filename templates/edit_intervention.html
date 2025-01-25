@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <title>Modifier une intervention</title>
+    <style>
+        .container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .btn-retour {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            color: #ffffff;
+            background-color: #4b6cb7;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-retour:hover {
+            background-color: #364a85;
+        }
+
+        h2 {
+            text-align: center;
+            color: #364a85;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #364a85;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #4b6cb7;
+            outline: none;
+            box-shadow: 0 0 5px rgba(75, 108, 183, 0.3);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .buttons button {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .btn-submit {
+            background-color: #4b6cb7;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background-color: #364a85;
+        }
+
+        .btn-annuler {
+            background-color: #d9534f;
+            color: white;
+        }
+
+        .btn-annuler:hover {
+            background-color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="{{ url_for('edit_intervention', id=intervention.id) }}" method="POST" onsubmit="confirmSubmission(event);">
+           
+            <h2>Modifier l'intervention</h2>
+
+            <div class="form-group">
+                <label for="date">Date :</label>
+                <input type="date" id="date" name="date" value="{{ intervention.date.strftime('%Y-%m-%d') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="type_intervention">Type d'intervention :</label>
+                <select id="type_intervention" name="type_intervention" required>
+                    <option value="soft" {% if intervention.type_intervention == 'soft' %}selected{% endif %}>Soft</option>
+                    <option value="hard" {% if intervention.type_intervention == 'hard' %}selected{% endif %}>Hard</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="motif">Motif :</label>
+                <textarea id="motif" name="motif" required>{{ intervention.motif }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="etat">État :</label>
+                <select id="etat" name="etat" required>
+                    <option value="réalisée" {% if intervention.etat == 'réalisée' %}selected{% endif %}>Réalisée</option>
+                    <option value="en attente" {% if intervention.etat == 'en attente' %}selected{% endif %}>En attente</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="client">Client :</label>
+                <select id="client" name="client_id" required>
+                    {% for client in clients %}
+                        <option value="{{ client.id }}" {% if client.id == intervention.client_id %}selected{% endif %}>
+                            {{ client.nom }} {{ client.prenom }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="intervenant">Intervenant :</label>
+                <select id="intervenant" name="intervenant_id" required>
+                    {% for intervenant in intervenants %}
+                        <option value="{{ intervenant.id }}" {% if intervenant.id == intervention.intervenant_id %}selected{% endif %}>
+                            {{ intervenant.nom }} {{ intervenant.prenom }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="buttons">
+                <button type="submit" class="btn-submit">Modifier l'intervention</button>
+                <button type="button" class="btn-annuler" onclick="window.location.href='/interventions';">Annuler</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function confirmSubmission(event) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Confirmer l\'action',
+                text: "Voulez-vous vraiment soumettre ce formulaire ?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4b6cb7',
+                cancelButtonColor: '#d9534f',
+                confirmButtonText: 'Oui',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.submit();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

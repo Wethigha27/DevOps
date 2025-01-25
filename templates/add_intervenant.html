@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Ajouter un Intervenant</title>
+    <style>
+        /* Style du corps de la page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Conteneur principal pour le formulaire */
+        .container {
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Style pour le titre */
+        h2 {
+            color: #364a85;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        /* Style des groupes de formulaire */
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        /* Style des étiquettes */
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #364a85;
+            margin-bottom: 5px;
+        }
+
+        /* Style des champs d'entrée */
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        /* Style de mise en évidence lors du focus */
+        .form-group input:focus {
+            border-color: #4b6cb7;
+            outline: none;
+            box-shadow: 0 0 5px rgba(75, 108, 183, 0.3);
+        }
+
+        /* Conteneur des boutons */
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        /* Style des boutons */
+        .buttons button {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0 5px;
+        }
+
+        button[type="submit"] {
+            background-color: #4b6cb7;
+            color: white;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #364a85;
+        }
+
+        .btn-annuler {
+            background-color: #d9534f;
+            color: white;
+        }
+
+        .btn-annuler:hover {
+            background-color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="{{ url_for('add_intervenant') }}" method="POST" onsubmit="return confirmSubmission(event);">
+            <h2>Ajouter un Intervenant</h2>
+
+            <div class="form-group">
+                <label for="nom">Nom :</label>
+                <input type="text" id="nom" name="nom" required>
+            </div>
+
+            <div class="form-group">
+                <label for="prenom">Prénom :</label>
+                <input type="text" id="prenom" name="prenom" required>
+            </div>
+
+            <div class="form-group">
+                <label for="poste">Poste :</label>
+                <input type="text" id="poste" name="poste" required>
+            </div>
+
+            <!-- Boutons Annuler et Ajouter -->
+            <div class="buttons">
+                <button type="submit">Ajouter l'Intervenant</button>
+                <button type="button" class="btn-annuler" onclick="window.location.href='/intervenants';">Annuler</button>
+                
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function confirmSubmission(event) {
+            event.preventDefault(); // Empêche le formulaire de se soumettre immédiatement
+            
+            Swal.fire({
+                title: 'Confirmer l\'action',
+                text: "Voulez-vous vraiment soumettre ce formulaire ?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4b6cb7',
+                cancelButtonColor: '#d9534f',
+                confirmButtonText: 'Oui',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.submit(); // Soumet le formulaire si l'utilisateur confirme
+                }
+            });
+        }
+    </script>
+</body>
+</html>

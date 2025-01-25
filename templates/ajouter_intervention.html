@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Ajouter une intervention</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #f3f4f6, #ffffff);
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: 700;
+            color: #4b6cb7;
+            margin: 50px 0 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 98%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #4b6cb7;
+            box-shadow: 0 0 8px rgba(75, 108, 183, 0.3);
+            outline: none;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .buttons button {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .btn-submit {
+            background: #4b6cb7;
+            color: #ffffff;
+        }
+
+        .btn-submit:hover {
+            background-color: #364a85;
+        }
+
+        .btn-annuler {
+            background-color: #d9534f;
+            color: #ffffff;
+        }
+
+        .btn-annuler:hover {
+            background-color: #a94442;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+       
+        <h2>Ajouter une intervention</h2>
+        <form action="{{ url_for('add_intervention') }}" method="POST" onsubmit="return confirmSubmission(event);">
+            <div class="form-group">
+                <label for="date">Date :</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="type_intervention">Type d'intervention :</label>
+                <select id="type_intervention" name="type_intervention" required>
+                    <option value="soft">Soft</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="motif">Motif :</label>
+                <textarea id="motif" name="motif" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="etat">État :</label>
+                <select id="etat" name="etat" required>
+                    <option value="réalisée">Réalisée</option>
+                    <option value="en attente">En attente</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="client">Client :</label>
+                <select id="client" name="client_id" required>
+                    {% for client in clients %}
+                        <option value="{{ client.id }}">{{ client.nom }} {{ client.prenom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="intervenant">Intervenant :</label>
+                <select id="intervenant" name="intervenant_id" required>
+                    {% for intervenant in intervenants %}
+                        <option value="{{ intervenant.id }}">{{ intervenant.nom }} {{ intervenant.prenom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="buttons">
+                <button type="submit" class="btn-submit">Ajouter l'intervention</button>
+                <button type="button" class="btn-annuler" onclick="window.location.href='/interventions';">Annuler</button>
+                
+            </div>
+        </form>
+    </div>
+    <script>
+        function confirmSubmission(event) {
+            event.preventDefault(); 
+            Swal.fire({
+                title: 'Confirmer l\'action',
+                text: "Voulez-vous vraiment soumettre ce formulaire ?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4b6cb7',
+                cancelButtonColor: '#d9534f',
+                confirmButtonText: 'Oui',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.submit();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

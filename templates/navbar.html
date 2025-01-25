@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navbar Élegante</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            background: url('{{ url_for('static', filename='images/back.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
+            padding-top: 80px; /* Ajout d’espace pour le contenu sous la navbar */
+        }
+        
+
+        .navbar {
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.9); /* Transparent blanc */
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 0; /* Pas de bords arrondis pour coller au haut */
+            position: fixed; /* Fixé en haut de la page */
+            top: 0;
+            left: 0;
+            z-index: 1000; /* Assure que la navbar est au-dessus du contenu */
+        }
+
+        .logo img {
+            width: 40px;
+            border-radius: 50%; /* Rendre le logo rond */
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #333;
+            transition: color 0.3s ease, border-bottom 0.3s ease, transform 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #2575fc;
+            border-bottom: 2px solid #2575fc;
+            transform: translateY(-3px); /* Animation élégante */
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            height: 3px;
+            width: 25px;
+            background-color: #333;
+            margin: 4px 0;
+            border-radius: 2px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .hamburger.toggle span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.toggle span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.toggle span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        .nav-links.open {
+            display: block;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 0;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+        }
+
+        .nav-links.open li {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('client') }}">GESTION DES CLIENTS</a></li>
+            <li><a href="{{ url_for('intervenants') }}">GESTION DES INTERVENANTS</a></li>
+            <li><a href="{{ url_for('interventions') }}">GESTION DES INTERVENTIONS</a></li>
+            <li><a href="{{ url_for('graphs') }}">GRAPHE</a></li>
+            <li><a href="{{ url_for('logout') }}">LOGOUT</a></li>
+        </ul>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <div class="content">
+        <!-- Votre contenu principal ici -->
+    </div>
+
+    <script>
+        // JavaScript pour le menu mobile
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('open');
+            hamburger.classList.toggle('toggle');
+        });
+    </script>
+</body>
+</html>

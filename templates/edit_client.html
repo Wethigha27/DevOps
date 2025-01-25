@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Modifier le Client</title>
+    <style>
+        /* Style pour le bouton de retour */
+        .btn-retour {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            font-size: 1em;
+            color: #ffffff;
+            background-color: #4b6cb7;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-retour:hover {
+            background-color: #364a85;
+        }
+
+        .btn-retour i {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        .container {
+            max-width: 400px;
+            margin-top: 100px;
+            margin-left: 29%;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            position: relative; /* Pour que le bouton de retour soit positionné par rapport à ce conteneur */
+        }
+
+        h2 {
+            text-align: center;
+            color: #364a85;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4b6cb7;
+            outline: none;
+            box-shadow: 0 0 5px rgba(75, 108, 183, 0.3);
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        button.submit-btn, a.cancel-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        button.submit-btn {
+            background-color: #4b6cb7;
+        }
+
+        button.submit-btn:hover {
+            background-color: #364a85;
+        }
+
+        a.cancel-btn {
+            background-color: #d9534f;
+            margin-left: 10px;
+        }
+
+        a.cancel-btn:hover {
+            background-color: #c9302c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Bouton de retour -->
+        <!-- <a href="/client" class="btn-retour">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a> -->
+
+        <h2>Modifier le Client</h2>
+
+        <form method="POST" onsubmit="confirmSubmission(event);">
+            <!-- Champs du formulaire -->
+            <label for="nom">Nom :</label>
+            <input type="text" id="nom" name="nom" value="{{ client.nom }}" required>
+            
+            <label for="prenom">Prénom :</label>
+            <input type="text" id="prenom" name="prenom" value="{{ client.prenom }}" required>
+            
+            <label for="direction">Direction :</label>
+            <input type="text" id="direction" name="direction" value="{{ client.direction }}" required>
+            
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">Enregistrer</button>
+                <a href="{{ url_for('client') }}" class="cancel-btn">Annuler</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function confirmSubmission(event) {
+            event.preventDefault(); // Empêche le formulaire de se soumettre immédiatement
+            
+            Swal.fire({
+                title: 'Confirmer l\'action',
+                text: "Voulez-vous vraiment soumettre ce formulaire ?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4b6cb7',
+                cancelButtonColor: '#d9534f',
+                confirmButtonText: 'Oui',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.submit(); // Soumet le formulaire si l'utilisateur confirme
+                }
+            });
+        }
+    </script>
+</body>
+</html>
