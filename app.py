@@ -191,3 +191,140 @@ def supprimer_client(id):
         db.session.rollback()  # Rollback in case of an error 
         print(f"Error: {e}")  
     return {'status': 'error', 'message': 'Une erreur est survenue lors de la suppression.'}
+
+
+@app.route('/interventions')
+def liste_interventions():
+    if 'util' not in session:
+        session.clear()
+        return redirect(url_for('auth'))
+    interventions = Intervention.query.all()  # Fetch all interventions
+    for intervention in interventions:
+        # Fetch the corresponding client and intervenant
+        client = Client.query.get(intervention.IdClient)
+        intervenant = Intervenant.query.get(intervention.IdIntervenants)
+        
+        # Assign the prenoms to intervention attributes
+        intervention.client_prenom = client.Prenom if client else "N/A"
+        intervention.intervenant_prenom = intervenant.Prenom if intervenant else "N/A"
+
+    return render_template('liste_interventions.html', interventions=interventions)
+
+    
+# from flask import jsonify
+
+@app.route('/ajouter_intervention', methods=['GET', 'POST'])
+def ajouter_intervention():
+    if request.method == 'POST':
+        # Retrieve the form data
+        # print("_/chhhhh")
+        
+        # Récupérer les données du formulaire
+        date = request.form.get('date')
+        intervenant_id = request.form.get('idIntervenants')
+        client_id = request.form.get('idClient')
+        motive = request.form.get('motive')
+        etat = request.form.get('etat')
+        type = request.form.get('type')
+
+        # Validation for required fields
+        if not date or not intervenant_id or not client_id:
+            flash("Tous les champs sont requis.", "error")
+            return redirect(url_for('ajouter_intervention'))
+
+        # Convert date and ids
+        try:
+            date_obj = datetime.strptime(date, '%Y-%m-%d')
+            intervenant_id = int(intervenant_id)
+            client_id = int(client_id)
+        except ValueError as e:
+            flash("Format de date ou d'ID invalide.", "error")
+            return redirect(url_for('ajouter_intervention'))
+
+        # Create the new intervention
+        nouvelle_intervention = Intervention(
+            Date=date_obj,
+            IdIntervenants=intervenant_id,
+            IdClient=client_id,
+            Etat=etat,
+            Motive=motive,
+            Type=type
+        )
+
+        # Save to the database
+        try:
+            db.session.add(nouvelle_intervention)
+            db.session.commit()
+            return {'status': 'success', 'message': 'L/intervention a été supprimé avec succès!'} 
+            # return redirect(url_for('liste_interventions'))
+        except Exception as e:
+            db.session.rollback()
+            flash("Une erreur s'est produite lors de l'ajout de l'intervention.", "error")
+
+    # Fetch clients and intervenants from the database
+    clients = Client.query.all()
+    intervenants = Intervenant.query.all()
+    print("/__ch")
+
+    return render_template('liste_interventions.html', clients=clients, intervenants=intervenants)
+
+
+
+@app.route('/get_clients_intervenants', methods=['GET'])
+def get_clients_intervenants():
+    # Récupération des intervenants et des clients pour les afficher dans les listes déroulantes
+    intervenants = Intervenant.query.all()
+    clients = Client.query.all()
+
+    # Structure des données pour la réponse JSON
+    data = {
+        'clients': [{'id': client.IdClient, 'prenom': client.Prenom, 'nom': client.Nom} for client in clients],
+        'intervenants': [{'id': intervenant.IdIntervenant, 'prenom': intervenant.Prenom, 'nom': intervenant.Nom} for intervenant in intervenants]
+    }
+    
+    return jsonify(data)
+from flask import make_response
+
+@app.route('/modifier_intervention/<int:id>', methods=['GET', 'POST'])
+def modifier_intervention(id):
+    intervention = Intervention.query.get_or_404(id)
+
+    if request.method == 'POST':
+        try:
+            # Update the intervention fields with the new data from the form
+            intervention.Type = request.form.get('type')
+            intervention.Motive = request.form.get('motive')
+            intervention.Etat = request.form.get('etat')
+
+            # Commit the changes
+            db.session.commit()
+            
+            return {'status': 'success', 'message': 'L\'intervention a été modifiée avec succès!'}
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error: {e}")
+            return {'status': 'error', 'message': 'Une erreur est survenue lors de la modification.'}
+
+    response = make_response(render_template('modifier_intervention.html', intervention=intervention))
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
+@app.route('/supprimer_intervention/<int:id>', methods=['POST'])
+def supprimer_intervention(id):
+    intervention = Intervention.query.get_or_404(id)
+    try:
+        db.session.delete(intervention)
+        db.session.commit()
+        return {'status': 'success', 'message': 'L\'intervention a été supprimée avec succès!'}
+    except Exception as e:
+        db.session.rollback()  # Rollback in case of an error
+    return {'status': 'error', 'message': 'Une erreur est survenue lors de la suppression.'}
+
+# @app.route('/chi')
+# def afficher_formulaire():
+#     clients = Client.query.all()
+#     intervenants = Intervenant.query.all()
+#     return render_template('test.html', clients=clients, intervenants=intervenants)
+
