@@ -328,3 +328,125 @@ def supprimer_intervention(id):
 #     intervenants = Intervenant.query.all()
 #     return render_template('test.html', clients=clients, intervenants=intervenants)
 
+def get_statistics():
+    # Récupérer tous les intervenants
+    intervenants = Intervenant.query.all()
+
+    # Calculer le pourcentage de tâches réalisées par chaque intervenant
+    stats_par_intervenant = []
+    for intervenant in intervenants:
+        total_taches = Intervention.query.filter_by(IdIntervenants=intervenant.IdIntervenant).count()
+        taches_realisees = Intervention.query.filter_by(IdIntervenants=intervenant.IdIntervenant, Etat='réalisées').count()
+        pourcentage_realise = (taches_realisees / total_taches * 100) if total_taches > 0 else 0
+        stats_par_intervenant.append({
+            'nom': intervenant.Prenom,
+            'pourcentage_realise': pourcentage_realise
+        })
+
+    # Calculer le pourcentage global de tâches réalisées ou en attente
+    total_interventions = Intervention.query.count()
+    interventions_realisees = Intervention.query.filter_by(Etat='réalisées').count()
+    interventions_en_attente = total_interventions - interventions_realisees
+    pourcentage_realise_global = (interventions_realisees / total_interventions * 100) if total_interventions > 0 else 0
+    pourcentage_en_attente_global = 100 - pourcentage_realise_global
+
+    return stats_par_intervenant, pourcentage_realise_global, pourcentage_en_attente_global
+
+@app.route('/stats')
+def stats():
+    if 'util' not in session:
+        session.clear()
+        return redirect(url_for('auth'))
+    stats_par_intervenant, pourcentage_realise_global, pourcentage_en_attente_global = get_statistics()
+    return render_template(
+        'stats.html',
+        stats_par_intervenant=stats_par_intervenant,
+        pourcentage_realise_global=pourcentage_realise_global,
+        pourcentage_en_attente_global=pourcentage_en_attente_global
+    )
+
+
+def generate_intervenant_chart(stats_par_intervenant):
+    labels = [item['nom'] for item in stats_par_intervenant]
+    sizes = [item['pourcentage_realise'] for item in stats_par_intervenant]
+    
+    # Définir les couleurs pour correspondre à Chart.js
+    colors = [
+        '#36A2EB',  # Bleu
+        '#FF6384',  # Rouge
+        '#FFCE56',  # Jaune
+        '#4BC0C0',  # Vert
+        '#9966FF',  # Violet
+        '#FF9F40'   # Orange
+    ]
+    
+    plt.figure(figsize=(6, 6))
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140, colors=colors)
+    plt.title("Pourcentage des tâches réalisées par chaque intervenant")
+    
+    # Sauvegarder le graphique dans un objet BytesIO
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    plt.close()
+    img.seek(0)
+
+    # Encoder en base64 pour l'inclure dans HTML
+    graph_base64 = base64.b64encode(img.getvalue()).decode('utf8')
+    return graph_base64
+
+def generate_global_chart(pourcentage_realise_global, pourcentage_en_attente_global):
+    labels = ['Réalisé', 'En attente']
+    sizes = [pourcentage_realise_global, pourcentage_en_attente_global]
+    
+    # Définir les couleurs pour correspondre à Chart.js
+    colors = [
+        '#4BC0C0',  # Vert pour "Réalisé"
+        '#FF6384'   # Rouge pour "En attente"
+    ]
+    
+    plt.figure(figsize=(6, 6))
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140, colors=colors)
+    plt.title("Pourcentage des tâches réalisées ou en attente")
+    
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    plt.close()
+    img.seek(0)
+
+    graph_base64 = base64.b64encode(img.getvalue()).decode('utf8')
+    return graph_base64
+
+
+@app.route('/export_pdf')
+def export_pdf():
+    stats_par_intervenant, pourcentage_realise_global, pourcentage_en_attente_global = get_statistics()
+
+    # Générer les graphiques sous forme d'images en base64
+    intervenant_chart = generate_intervenant_chart(stats_par_intervenant)
+    global_chart = generate_global_chart(pourcentage_realise_global, pourcentage_en_attente_global)
+
+    # Utiliser un template avec les images en base64
+    rendered = render_template(
+        'stats_export.html',
+        intervenant_chart=intervenant_chart,
+        global_chart=global_chart
+    )
+
+    path_wkhtmltopdf = r"C:\wkhtmltox\bin\wkhtmltopdf.exe"
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+    options = {
+        'enable-local-file-access': None
+    }
+
+    pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
+
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=statistiques.pdf'
+
+    return response
+
+with app.app_context():
+    db.create_all()
+    app.run(port=2000, debug=True)
