@@ -14,8 +14,6 @@ import plotly.graph_objects as go
 import json
 from flask import jsonify
 
-
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///interventions.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
